@@ -2,6 +2,38 @@
 
 ## Clone your GitHub repository in Workbench
 
+### HTTPS
+
+1. Copy the HTTPS URL of your repository
+
+2. In VSCode, start a new Terminal and type:
+```bash
+git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
+```
+3. Click "Allow"
+
+![Alt text](img/Github_signin.png)
+
+4. Click "Copy & Continue on Github"
+
+![Alt text](img/Github_vscode.png)
+
+5. Paste your code to authorize the new device
+
+![Alt text](img/Github_signin_3.png)
+
+6. Configure your instance with your Github user information
+```bash
+git config --global user.name "USERNAME"
+git config --global user.email "EMAIL_ADDRESS"
+```
+- using a `--global` settings does not persist when starting/stopping Workbenches
+- using `--local` instead of `--global` can persist if your repository is on a persistant volume, but needs to be done for each new project.
+```bash
+git config --local user.name "USERNAME"
+git config --local user.email "EMAIL_ADDRESS"
+```
+
 ### SSH
 
 1. Create a Home Persistent Volume on Workbench
@@ -51,36 +83,4 @@ You can also add it to `/home/sas/.bash_profile` to avoid running it for each ne
 
 ```bash
 eval "$(ssh-agent -s)" && cat /home/sas/.ssh/id_rsa | ssh-add -k -
-```
-
-### HTTPS
-
-1. Copy the HTTPS URL of your repository
-
-2. In VSCode, start a new Terminal and type:
-```bash
-git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
-```
-3. Click "Allow"
-
-![Alt text](img/Github_signin.png)
-
-4. Click "Copy & Continue on Github"
-
-![Alt text](img/Github_vscode.png)
-
-5. Paste your code to authorize the new device
-
-![Alt text](img/Github_signin_3.png)
-
-6. Configure your instance with your Github user information
-```bash
-git config --global user.name "USERNAME"
-git config --global user.email "EMAIL_ADDRESS"
-```
-- using a `--global` settings does not persist when starting/stopping Workbenches
-- using `--local` instead of `--global` can persist if your repository is on a persistant volume, but needs to be done for each new project.
-```bash
-git config --local user.name "USERNAME"
-git config --local user.email "EMAIL_ADDRESS"
 ```
