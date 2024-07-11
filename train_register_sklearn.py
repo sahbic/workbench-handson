@@ -12,7 +12,7 @@ from sklearn.preprocessing import OrdinalEncoder, OneHotEncoder
 from sasctl import pzmm
 from sasctl.services import model_repository as mr
 
-from establish_connection import get_connection
+from utils import build_X_y, get_or_create_project, get_connection
 
 warnings.filterwarnings("ignore", message="The following arguments are required for the automatic generation of score code")
 warnings.filterwarnings("ignore", message="This model's properties are different from the project's.")
@@ -31,9 +31,7 @@ pklFileName = f'/workspaces/{storage_name}/{script_folder}sklearn_mm_assets/skle
 project_name = "Workbench Models"
 repository_name = "DMRepository"
 
-df = pd.read_csv('data/CUSTOMS.csv')
-X = df.drop([target, "packageID"], axis=1)
-y = df[target]
+X, y = build_X_y('data/CUSTOMS.csv', target)
 
 # Define the preprocessing steps
 preprocessor = ColumnTransformer(
@@ -62,16 +60,17 @@ with open(pklFileName, 'wb') as file:
 if len(sys.argv) == 1:
     get_connection()
 elif len(sys.argv) == 2:
-    refresh_file = sys.argv[1]
-    get_connection(refresh_file=refresh_file)
-elif len(sys.argv) == 3:
-    refresh_file = sys.argv[1]
-    verification_file = sys.argv[2]
-    print(f"refresh_file received: {refresh_file}")
+    verification_file = sys.argv[1]
     print(f"verification_file received: {verification_file}")
+    get_connection(verification=verification_file)
+elif len(sys.argv) == 3:
+    verification_file = sys.argv[1]
+    refresh_file = sys.argv[2]
+    print(f"verification_file received: {verification_file}")
+    print(f"refresh_file received: {refresh_file}")
     get_connection(verification=verification_file, refresh_file=refresh_file)
 
-target_df =pd.DataFrame(data=[[0.8,0.2,"No"]],columns=['P_InspectionNo','P_InspectionYes','I_Inspection'])
+target_df = pd.DataFrame(data=[[0.8,0.2,"No"]],columns=['P_InspectionNo','P_InspectionYes','I_Inspection'])
 
 pzmm.JSONFiles.write_var_json(X, is_input=True, json_path=f"/workspaces/{storage_name}/{script_folder}sklearn_mm_assets/")
 pzmm.JSONFiles.write_var_json(target_df, is_input=False, json_path=f"/workspaces/{storage_name}/{script_folder}sklearn_mm_assets/")
@@ -86,12 +85,7 @@ pzmm.JSONFiles.write_model_properties_json(model_name=model_name,
                             json_path=f"/workspaces/{storage_name}/{script_folder}sklearn_mm_assets/",
                             modeler='Mattia')
 
-repository = mr.get_repository(repository_name)
-
-try:
-    project = mr.create_project(project_name, repository)
-except:
-    project = mr.get_project(project_name)
+project = get_or_create_project(project_name, repository_name)
 
 import_model = pzmm.ImportModel.import_model(
     overwrite_model=True,
